@@ -14,8 +14,8 @@ sigma = np.array([[[1, 0], [0, 1]],
 
 
 T_matrix = np.array([[1, 0, 0, 1],
-                          [0, 1, -1j, 0],
                           [0, 1, 1j, 0],
+                          [0, 1, -1j, 0],
                           [1, 0, 0, -1]]) # transformation matrix from odinary basis to Pauli basis
                                           # vec(in ordinary) = trans_matrix * vec (in Pauli)
 T_matrix_inv = np.linalg.inv(T_matrix)

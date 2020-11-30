@@ -108,47 +108,53 @@ class VirtualQubitSystem:
         self.c_T1 = []
         if ('T1' in sys_args):
             for i in range(self.nQbt):
-                coef1 = np.sqrt(1/sys_args['T1'][i])
-                if self.nLvl[i] == 2:
-                    dampingChannels = [coef1*np.array([[0, 1],
-                                                       [0, 0]])]
-                elif self.nLvl[i] == 3:
-                    dampingChannels = [coef1*np.array([[0, 1, 0],
-                                                       [0, 0, 0],
-                                                       [0, 0, 0]])]
-                for item in dampingChannels:
-                    tmp = []
-                    for j in range(self.nQbt):
-                        if i == j:
-                            tmp += [item]
-                        else:
-                            tmp += [np.identity(self.nLvl[j])]
-                    c_T1 = tmp[0]
-                    for j in range(1, len(tmp)):
-                        c_T1 = np.kron(c_T1, tmp[j]) 
-                    self.c_T1 += [tf.constant(c_T1, dtype=tf.complex128)]
+                if sys_args['T1'][i] > 0:
+                    coef1 = np.sqrt(1/sys_args['T1'][i])
+                    if self.nLvl[i] == 2:
+                        dampingChannels = [coef1*np.array([[0, 1],
+                                                           [0, 0]])]
+                    elif self.nLvl[i] == 3:
+                        dampingChannels = [coef1*np.array([[0, 1, 0],
+                                                           [0, 0, 0],
+                                                           [0, 0, 0]])]
+                    for item in dampingChannels:
+                        tmp = []
+                        for j in range(self.nQbt):
+                            if i == j:
+                                tmp += [item]
+                            else:
+                                tmp += [np.identity(self.nLvl[j])]
+                        c_T1 = tmp[0]
+                        for j in range(1, len(tmp)):
+                            c_T1 = np.kron(c_T1, tmp[j]) 
+                        self.c_T1 += [tf.constant(c_T1, dtype=tf.complex128)]
+                elif sys_args['T1'][i] != 0:
+                    print('T1 <= 0 and != 0')
         self.c_Tf = []
         if ('Tf' in sys_args):
             for i in range(self.nQbt):
-                coef2 = np.sqrt(1/(2*sys_args['Tf'][i]))
-                if self.nLvl[i] == 2:
-                    dampingChannels = [coef2*np.array([[1, 0],
-                                                       [0, -1]])]
-                elif self.nLvl[i] == 3:
-                    dampingChannels = [coef2*np.array([[1, 0, 0],
-                                                       [0, -1, 0],
-                                                       [0, 0, 0]])]
-                for item in dampingChannels:
-                    tmp = []
-                    for j in range(self.nQbt):
-                        if i == j:
-                            tmp += [item]
-                        else:
-                            tmp += [np.identity(self.nLvl[j])]
-                    c_Tf = tmp[0]
-                    for j in range(1, len(tmp)):
-                        c_Tf = np.kron(c_Tf, tmp[j]) 
-                    self.c_Tf += [tf.constant(c_Tf, dtype=tf.complex128)]
+                if sys_args['Tf'][i] > 0:
+                    coef2 = np.sqrt(1/(2*sys_args['Tf'][i]))
+                    if self.nLvl[i] == 2:
+                        dampingChannels = [coef2*np.array([[1, 0],
+                                                           [0, -1]])]
+                    elif self.nLvl[i] == 3:
+                        dampingChannels = [coef2*np.array([[1, 0, 0],
+                                                           [0, -1, 0],
+                                                           [0, 0, 0]])]
+                    for item in dampingChannels:
+                        tmp = []
+                        for j in range(self.nQbt):
+                            if i == j:
+                                tmp += [item]
+                            else:
+                                tmp += [np.identity(self.nLvl[j])]
+                        c_Tf = tmp[0]
+                        for j in range(1, len(tmp)):
+                            c_Tf = np.kron(c_Tf, tmp[j]) 
+                        self.c_Tf += [tf.constant(c_Tf, dtype=tf.complex128)]
+                elif sys_args['Tf'][i] != 0:
+                    print('Tf <= 0 and != 0')
                 
             
             

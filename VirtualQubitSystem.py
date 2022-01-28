@@ -50,7 +50,6 @@ class VirtualQubitSystem:
         'T1':       list of amplitude damping times (unnecessary) only for 2 and 3 lvls
         'Tf':       list of phase damping times (unnecessary) only for 2 and 3 lvls
     }
-
     '''
     def __init__(self, sys_args):
         self.nQbt = sys_args['nQbt']

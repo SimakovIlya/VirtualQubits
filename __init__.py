@@ -1,3 +1,3 @@
 from .VirtualQubitSystem import *
+from .VirtQ import *
 from .PTM import *
-from .Gates import *

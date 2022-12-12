@@ -88,6 +88,33 @@ def to_Pauli_T_matrix(O):
 
 
 
+sigma2d = np.empty((16, 4, 4), np.complex)
+for i in range(0, 4):
+    for j in range(0, 4):
+        sigma2d[4*i + j,:,:] = np.kron(sigma[i], sigma[j])
+        
+def to_Pauli_T_matrix_sp(O):
+    '''
+    Convert "unitatary" matrix O to Pauli Transfer Matrix
+
+    Same as to_Pauli_T_matrix but quicker for a list of matricies
+    '''
+    flag = False
+    if len(O.shape)==3:
+        flag = True
+        O = O[np.newaxis]
+    T = np.zeros((O.shape[0], O.shape[1], 16, 16), dtype=complex)
+    for i in range(0, 16):
+        for j in range(0, 16):
+            T[:,:,i,j] = 1/4 * np.trace(sigma2d[np.newaxis, np.newaxis, i,:,:]@O@\
+                                        sigma2d[np.newaxis, np.newaxis, j,:,:]@np.einsum('ijkl->ijlk', O.conj()),
+                                        axis1=2, axis2=3)    
+    if flag:
+        O = O[0]
+    return np.real(T)
+
+
+
 
 def ptm_fidelity(T1, T2):
     '''

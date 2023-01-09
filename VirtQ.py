@@ -25,9 +25,20 @@ def plot_pcolormesh(f, x, y, xlabel = '', ylabel = '', opt_lines=True, title=Non
 
     opt_y_ind = np.argmax(np.real(f))//f.shape[1]
     opt_x_ind = np.argmax(np.real(f))%f.shape[1]
-    print('opt '+xlabel, float(x[opt_x_ind]), 'index', opt_x_ind)
-    print('opt '+ylabel, y[opt_y_ind], 'index', opt_y_ind)
-    print('function',np.abs(f[opt_y_ind, opt_x_ind]))
+    print('opt max '+xlabel, float(x[opt_x_ind]), 'index', opt_x_ind)
+    print('opt max '+ylabel, y[opt_y_ind], 'index', opt_y_ind)
+    print('function max ',np.abs(f[opt_y_ind, opt_x_ind]))
+
+    if opt_lines:
+        axs.hlines(y[opt_y_ind], x[0], x[-1])
+        axs.vlines(x[opt_x_ind], y[0], y[-1])
+
+    opt_y_ind = np.argmin(np.real(f)) // f.shape[1]
+    opt_x_ind = np.argmin(np.real(f)) % f.shape[1]
+    print('opt min ' + xlabel, float(x[opt_x_ind]), 'index', opt_x_ind)
+    print('opt min ' + ylabel, y[opt_y_ind], 'index', opt_y_ind)
+    print('function min ', np.abs(f[opt_y_ind, opt_x_ind]))
+
     if opt_lines:
         axs.hlines(y[opt_y_ind], x[0], x[-1])
         axs.vlines(x[opt_x_ind], y[0], y[-1])
@@ -122,16 +133,14 @@ class VirtQ:
     
     
     
-    
+    def set_Lindblad_operators(self, Lindblad_operators):
+        self.Lindblad_operators = Lindblad_operators
+
+
     def __Lindblad(self, rho, t):
         H = self.calc_timedepH(self.calc_H_as_time_function(t))
         res = -1j*(H@rho - rho@H)
-        for c in self.c_T1:
-            cadj = tf.linalg.adjoint(c)
-            res += c[tf.newaxis, :, :]@rho@cadj[tf.newaxis, :, :] - 0.5*\
-                   (cadj[tf.newaxis, :, :]@c[tf.newaxis, :, :]@rho +\
-                    rho@cadj[tf.newaxis, :, :]@c[tf.newaxis, :, :])
-        for c in self.c_Tf:
+        for c in self.Lindblad_operators:
             cadj = tf.linalg.adjoint(c)
             res += c[tf.newaxis, :, :]@rho@cadj[tf.newaxis, :, :] - 0.5*\
                    (cadj[tf.newaxis, :, :]@c[tf.newaxis, :, :]@rho +\

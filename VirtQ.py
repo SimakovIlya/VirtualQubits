@@ -62,13 +62,13 @@ def mytensordotlist(l):
 
 class VirtQ:
     '''
-    Class VirtQ for simulatining quantum system with fluxonium qubits.
+    Class VirtQ for simulation of quantum system with fluxonium qubits.
     It is a new version of VirtualQubitSystem
 
     Params
     ------
     calc_timedepH (function)   :    function that returns the Hamiltonian as a function of some parameter(s),
-                                    function of the pararmeter(s) calls in functions scan_fidelitySE and 
+                                    function of the pararmeter(s) calls in functions scan_fidelitySE and
                                     scan_fidelityME as calc_H_as_time_function(t):
                                     calc_timedepH(calc_H_as_time_function(t))
     '''
@@ -161,6 +161,14 @@ class VirtQ:
     
     
     def scan_fidelitySE(self, calc_H_as_time_function, psi_flag = False, progress_bar = True):
+        """
+        Calculate evolution of Schedinger equation under multiple Hamiltonians (multiple drives)
+
+        :param calc_H_as_time_function (function):  parameters of Hamiltonian
+        :param psi_flag (bool): save evolution of wavefunctions
+        :param progress_bar(bool): show progress_bar
+        :return: fidelity(initstate, targetstate), psilist (if psi_flag==True)
+        """
         psi = tf.tile(self.initstate[tf.newaxis],\
                       (self.calc_timedepH(calc_H_as_time_function(self.timelist[0])).shape[0], 1, 1))
         resultFid = []

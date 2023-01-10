@@ -128,8 +128,19 @@ class VirtQ:
 
 
 
-    def __solveSE(self, psi, H, dt):
+    def __solveSE_expm(self, psi, H, dt):
         return tf.linalg.expm(-1j*dt*H)@psi
+
+    def __Schrodinger_step(self, psi, t):
+        H = self.calc_timedepH(self.calc_H_as_time_function(t))
+        return -1j * H @ psi
+
+    def __solveSE_RK4(self, psi, t, dt):
+        k1 = self.__Schrodinger_step(psi, t)
+        k2 = self.__Schrodinger_step(psi + dt * k1 / 2, t + dt / 2)
+        k3 = self.__Schrodinger_step(psi + dt * k2 / 2, t + dt / 2)
+        k4 = self.__Schrodinger_step(psi + dt * k3, t + dt)
+        return psi + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
     
     
     
@@ -160,15 +171,18 @@ class VirtQ:
 
     
     
-    def scan_fidelitySE(self, calc_H_as_time_function, psi_flag = False, progress_bar = True):
+    def scan_fidelitySE(self, calc_H_as_time_function, psi_flag = False, progress_bar = True, solver='expm'):
         """
         Calculate evolution of Schedinger equation under multiple Hamiltonians (multiple drives)
 
         :param calc_H_as_time_function (function):  parameters of Hamiltonian
         :param psi_flag (bool): save evolution of wavefunctions
         :param progress_bar(bool): show progress_bar
+        :param solver: exmp or RK4
         :return: fidelity(initstate, targetstate), psilist (if psi_flag==True)
         """
+        if solver == 'RK4':
+            self.calc_H_as_time_function = calc_H_as_time_function
         psi = tf.tile(self.initstate[tf.newaxis],\
                       (self.calc_timedepH(calc_H_as_time_function(self.timelist[0])).shape[0], 1, 1))
         resultFid = []
@@ -181,8 +195,11 @@ class VirtQ:
         else:
             i_range = range(1, self.timelist.shape[0])
         for i in i_range:
-            psi = self.__solveSE(psi, self.calc_timedepH(calc_H_as_time_function(self.timelist[i-1])),\
-                                 self.timelist[i]-self.timelist[i-1])
+            if solver == 'expm':
+                psi = self.__solveSE_expm(psi, self.calc_timedepH(calc_H_as_time_function(self.timelist[i-1])),\
+                                     self.timelist[i]-self.timelist[i-1])
+            elif solver == 'RK4':
+                psi = self.__solveSE_RK4(psi, self.timelist[i], self.timelist[i] - self.timelist[i - 1])
             resultFid.append(self.calc_fidelity_psi(psi))
             if psi_flag:
                 psilist.append(psi)

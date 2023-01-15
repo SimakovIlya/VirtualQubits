@@ -176,7 +176,7 @@ class VirtQ:
         Calculate evolution of Schedinger equation under multiple Hamiltonians (multiple drives)
 
         :param calc_H_as_time_function (function):  parameters of Hamiltonian
-        :param psi_flag (bool): save evolution of wavefunctions
+        :param psi_flag (bool): save evolution of wavefunctions if False return only final psi
         :param progress_bar(bool): show progress_bar
         :param solver: exmp or RK4
         :return: fidelity(initstate, targetstate), psilist (if psi_flag==True)
@@ -207,7 +207,7 @@ class VirtQ:
             return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2)),\
                    tf.transpose(tf.convert_to_tensor(psilist, psi.dtype), (1,0,2,3))
         else:
-            return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2))
+            return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2)), psi
 
 
 
@@ -238,7 +238,7 @@ class VirtQ:
             return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2)),\
                    tf.transpose(tf.convert_to_tensor(rholist, rho.dtype), (1,0,2,3))
         else:
-            return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2))
+            return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2)), rho
     
     
     

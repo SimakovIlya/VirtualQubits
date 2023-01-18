@@ -270,7 +270,7 @@ class VirtualQubitSystem:
             return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2)),\
                    tf.transpose(tf.convert_to_tensor(psilist, psi.dtype), (1,0,2,3))
         else:
-            return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2))
+            return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2)), psi
 
 
 
@@ -301,7 +301,7 @@ class VirtualQubitSystem:
             return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2)),\
                    tf.transpose(tf.convert_to_tensor(rholist, rho.dtype), (1,0,2,3))
         else:
-            return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2))
+            return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2)), psi
     
     
     

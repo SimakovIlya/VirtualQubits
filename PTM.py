@@ -83,7 +83,17 @@ def to_Pauli_T_matrix(O):
                 sigma2d[4*i + j,:,:] = np.kron(sigma[i], sigma[j])
         for i in range(0, 16):
             for j in range(0, 16):
-                T[i,j] = 1/4 * np.trace(sigma2d[i,:,:]@O@sigma2d[j,:,:]@np.transpose(O.conj()))       
+                T[i,j] = 1/4 * np.trace(sigma2d[i,:,:]@O@sigma2d[j,:,:]@np.transpose(O.conj()))   
+    if (O.shape[0] == 8):
+        T = np.identity(64, dtype=complex)
+        for i in range(0, 64):
+            for j in range(0, 64):
+                T[i,j] = 1/8 * np.trace(sigma3d[i,:,:]@O@sigma3d[j,:,:]@np.transpose(O.conj()))  
+    if (O.shape[0] == 16):
+        T = np.identity(256, dtype=complex)
+        for i in range(0, 256):
+            for j in range(0, 256):
+                T[i,j] = 1/16 * np.trace(sigma4d[i,:,:]@O@sigma4d[j,:,:]@np.transpose(O.conj()))       
     return np.real(T)
 
 
@@ -92,6 +102,23 @@ sigma2d = np.empty((16, 4, 4), np.complex)
 for i in range(0, 4):
     for j in range(0, 4):
         sigma2d[4*i + j,:,:] = np.kron(sigma[i], sigma[j])
+
+
+sigma3d = np.empty((4**3, 8, 8), np.complex)
+for i in range(4):
+    for j in range(4):
+        for k in range(4):
+            sigma3d[16*i+4*j+k] = np.kron(np.kron(sigma[i], sigma[j]), sigma[k])
+
+
+sigma4d = np.empty((4**4, 16, 16), np.complex)
+for i in range(4):
+    for j in range(4):
+        for k in range(4):
+            for m in range(4):
+                sigma4d[64*i+16*j+4*k+m] = np.kron(np.kron(np.kron(sigma[i], sigma[j]), sigma[k]), sigma[m])
+
+
         
 def to_Pauli_T_matrix_sp(O):
     '''
@@ -109,6 +136,48 @@ def to_Pauli_T_matrix_sp(O):
             T[:,:,i,j] = 1/4 * np.trace(sigma2d[np.newaxis, np.newaxis, i,:,:]@O@\
                                         sigma2d[np.newaxis, np.newaxis, j,:,:]@np.einsum('ijkl->ijlk', O.conj()),
                                         axis1=2, axis2=3)    
+    if flag:
+        O = O[0]
+    return np.real(T)
+
+
+def to_Pauli_T_matrix_sp3(O):
+    '''
+    Convert "unitatary" matrix O to Pauli Transfer Matrix (3q-gates)
+
+    Same as to_Pauli_T_matrix but quicker for a list of matricies
+    '''
+    flag = False
+    if len(O.shape)==3:
+        flag = True
+        O = O[np.newaxis]
+    T = np.zeros((O.shape[0], O.shape[1], 64, 64), dtype=complex)
+    for i in range(0, 64):
+        for j in range(0, 64):
+            T[:,:,i,j] = 1/8 * np.trace(sigma3d[np.newaxis, np.newaxis, i,:,:]@O@\
+                                        sigma3d[np.newaxis, np.newaxis, j,:,:]@np.einsum('ijkl->ijlk', O.conj()),
+                                        axis1=2, axis2=3)    
+    if flag:
+        O = O[0]
+    return np.real(T)
+
+
+def to_Pauli_T_matrix_sp4(O):
+    '''
+    Convert "unitatary" matrix O to Pauli Transfer Matrix (4q-gates)
+
+    Same as to_Pauli_T_matrix but quicker for a list of matricies
+    '''
+    flag = False
+    if len(O.shape)==3:
+        flag = True
+        O = O[np.newaxis]
+    T = np.zeros((O.shape[0], O.shape[1], 256, 156), dtype=complex)
+    for i in range(0, 156):
+        for j in range(0, 256):
+            T[:,:,i,j] = 1/16 * np.trace(sigma4d[np.newaxis, np.newaxis, i,:,:]@O@\
+                                         sigma4d[np.newaxis, np.newaxis, j,:,:]@np.einsum('ijkl->ijlk', O.conj()),
+                                         axis1=2, axis2=3)    
     if flag:
         O = O[0]
     return np.real(T)

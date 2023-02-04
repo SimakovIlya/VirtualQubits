@@ -74,6 +74,7 @@ class VirtQ:
     '''
     def __init__(self, calc_timedepH):
         self.calc_timedepH = calc_timedepH
+        self.Lindblad_operators = []
             
             
 
@@ -239,6 +240,27 @@ class VirtQ:
                    tf.transpose(tf.convert_to_tensor(rholist, rho.dtype), (1,0,2,3))
         else:
             return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2)), rho
+
+    def get_process_matrix(self, H_basis, basis_list, calc_Phi, progress_bar=False):
+        e, v = np.linalg.eigh(H_basis)
+        v_inv = tf.linalg.inv(v)
+
+        process_matrix = []
+        for i in tqdm(range(len(basis_list) ** 2)):
+            rho = v[:, basis_list[i % len(basis_list)]][:, tf.newaxis] @ v[:, basis_list[i // len(basis_list)]][
+                                                                         tf.newaxis, :]
+            self.initrho = rho
+
+            _, rholist = self.scan_fidelityME(calc_Phi, False, progress_bar)
+
+            rholist = v_inv[tf.newaxis] @ rholist @ tf.linalg.adjoint(v_inv)[tf.newaxis]
+            rholist = rholist.numpy()[:, basis_list][:, :, basis_list]
+            # Some spanish shame
+            process_matrix_ = []
+            for rho in rholist:
+                process_matrix_.append(np.ravel(rho.T))
+            process_matrix.append(np.asarray(process_matrix_))
+        return np.transpose(np.asarray(process_matrix), (1, 0, 2))
     
     
     

@@ -77,7 +77,7 @@ def to_Pauli_T_matrix(O):
                 T[i,j] = 1/2 * np.trace(sigma[i]@O@sigma[j]@np.conj(O.T))
     if (O.shape[0] == 4):
         T = np.identity(16, dtype=complex)
-        sigma2d = np.empty((16, 4, 4), np.complex)
+        sigma2d = np.empty((16, 4, 4), complex)
         for i in range(0, 4):
             for j in range(0, 4):
                 sigma2d[4*i + j,:,:] = np.kron(sigma[i], sigma[j])
@@ -98,25 +98,51 @@ def to_Pauli_T_matrix(O):
 
 
 
-sigma2d = np.empty((16, 4, 4), np.complex)
+sigma2d = np.empty((16, 4, 4), complex)
 for i in range(0, 4):
     for j in range(0, 4):
         sigma2d[4*i + j,:,:] = np.kron(sigma[i], sigma[j])
 
 
-sigma3d = np.empty((4**3, 8, 8), np.complex)
+sigma3d = np.empty((4**3, 8, 8), complex)
 for i in range(4):
     for j in range(4):
         for k in range(4):
             sigma3d[16*i+4*j+k] = np.kron(np.kron(sigma[i], sigma[j]), sigma[k])
 
 
-sigma4d = np.empty((4**4, 16, 16), np.complex)
+sigma4d = np.empty((4**4, 16, 16), complex)
 for i in range(4):
     for j in range(4):
         for k in range(4):
             for m in range(4):
                 sigma4d[64*i+16*j+4*k+m] = np.kron(np.kron(np.kron(sigma[i], sigma[j]), sigma[k]), sigma[m])
+
+sigmas = [sigma, sigma2d, sigma3d]
+
+def vec(A):
+    res = np.ravel(A.T).T
+    return np.reshape(res, (res.shape[0], 1))
+
+
+def get_Uc2p(N):
+    res = np.zeros((4 ** N, 4 ** N), complex)
+    for k in range(4 ** N):
+        c = np.zeros((4 ** N, 1), complex)
+        c[k, 0] = 1
+        vecP = np.conj(vec(sigmas[N - 1][k])).T
+        res += c @ vecP
+    return res
+
+
+Uc2p = [get_Uc2p(N) for N in range(1, 4)]
+
+
+def superoperator2PTM(superoperator):
+    N = int(np.log2(superoperator.shape[-1])) // 2
+    #     print(N, Uc2p[N-1].shape)
+    PTM = Uc2p[N - 1] @ superoperator @ np.conj(Uc2p[N - 1].T) / 2 ** N
+    return PTM
 
 
         

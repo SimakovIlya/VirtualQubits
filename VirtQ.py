@@ -216,7 +216,7 @@ class VirtQ:
     def scan_fidelityME(self, calc_H_as_time_function, rho_flag = False, progress_bar = True):
         self.calc_H_as_time_function = calc_H_as_time_function
         if self.initstate.shape[1] != 1:
-            print('No initial rho')
+            print('No initial rho if it is supposed to be set via set_initstate')
         rho = tf.tile(self.initrho[tf.newaxis],\
                       (self.calc_timedepH(calc_H_as_time_function(self.timelist[0])).shape[0], 1, 1))
         resultFid = []
@@ -241,11 +241,11 @@ class VirtQ:
         else:
             return tf.transpose(tf.math.abs(tf.convert_to_tensor(resultFid)), (1,0,2)), rho
 
-    def get_process_matrix(self, H_basis, basis_list, calc_Phi, progress_bar=False):
+    def get_superoperator(self, H_basis, basis_list, calc_Phi, progress_bar=False):
         e, v = np.linalg.eigh(H_basis)
         v_inv = tf.linalg.inv(v)
 
-        process_matrix = []
+        superoperator = []
         for i in tqdm(range(len(basis_list) ** 2)):
             rho = v[:, basis_list[i % len(basis_list)]][:, tf.newaxis] @ v[:, basis_list[i // len(basis_list)]][
                                                                          tf.newaxis, :]
@@ -256,11 +256,11 @@ class VirtQ:
             rholist = v_inv[tf.newaxis] @ rholist @ tf.linalg.adjoint(v_inv)[tf.newaxis]
             rholist = rholist.numpy()[:, basis_list][:, :, basis_list]
             # Some spanish shame
-            process_matrix_ = []
+            superoperator_ = []
             for rho in rholist:
-                process_matrix_.append(np.ravel(rho.T))
-            process_matrix.append(np.asarray(process_matrix_))
-        return np.transpose(np.asarray(process_matrix), (1, 0, 2))
+                superoperator_.append(np.ravel(rho.T))
+            superoperator.append(np.asarray(superoperator_))
+        return np.transpose(np.asarray(superoperator), (1, 0, 2))
     
     
     

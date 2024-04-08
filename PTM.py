@@ -277,6 +277,19 @@ def plot_ptm_compare(ptm1, ptm2, dif=False, title1='', title2='', title3=''):
             fig, (f1, f2, f3) = plt.subplots(
                 nrows=1, ncols=3,
                 figsize=(14 * figsize_coef, 5))
+        elif matrix1.shape[0] == 64:
+            label = ['III', 'IIX', 'IIY', 'IIZ', 'IXI', 'IXX', 'IXY', 'IXZ', 'IYI', 'IYX', 'IYY', 'IYZ', 'IZI', 'IZX',
+                     'IZY', 'IZZ',
+                     'XII', 'XIX', 'XIY', 'XIZ', 'XXI', 'XXX', 'XXY', 'XXZ', 'XYI', 'XYX', 'XYY', 'XYZ', 'XZI', 'XZX',
+                     'XZY', 'XZZ',
+                     'YII', 'YIX', 'YIY', 'YIZ', 'YXI', 'YXX', 'YXY', 'YXZ', 'YYI', 'YYX', 'YYY', 'YYZ', 'YZI', 'YZX',
+                     'YZY', 'YZZ',
+                     'ZII', 'ZIX', 'ZIY', 'ZIZ', 'ZXI', 'ZXX', 'ZXY', 'ZXZ', 'ZYI', 'ZYX', 'ZYY', 'ZYZ', 'ZZI', 'ZZX',
+                     'ZZY', 'ZZZ',
+                     ]
+            fig, (f1, f2, f3) = plt.subplots(
+                nrows = 1, ncols = 3,
+                figsize=(18*figsize_coef, 6))
         else:
             print('ERROR in size of ptm')
     else:
@@ -298,7 +311,7 @@ def plot_ptm_compare(ptm1, ptm2, dif=False, title1='', title2='', title3=''):
                      ]
             fig, (f1, f2) = plt.subplots(
                 nrows=1, ncols=2,
-                figsize=(14 * figsize_coef, 5))
+                figsize=(18 * figsize_coef, 6))
         else:
             print('ERROR in size of ptm')
 
